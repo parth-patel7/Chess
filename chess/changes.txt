@@ -1,0 +1,92 @@
+10/21 Josh 11:30PM:
+	chessBoard: 
+		- Added board numbers and letters around the outside of the board.
+	ChessHelper: 
+		- Fixed bug where black could not move regardless if the move was legal or not.
+		- added bishop and pawn to movePiece.
+	ChessPieceBishop: 
+		- bishopLegalMove and moveBishop added.
+	ChessPiecePawn:
+		- pawnLegalMove and movePawn added (still need to implement rule where pawn can move 2 spaces on first move).
+	
+10/22 Josh 1:30PM:
+	ChessPiecePawn:
+		- updated movement on pawn; can move 2 spaces on starting position unless there is a piece in between.
+		can only move one space other wise.
+		- implemented attack moves; pawn can capture a piece if there's an opposite color piece diagonal to them (forward only).
+		- pawn cannot capture piece in front of them.
+
+10/22 Parth 6:40PM:
+	chessBoard: 
+		- Fixed a bug where moving from empty cell was throwing exception error
+		- added resign
+	ChessPieceRook: 
+		- rookLegalMove, isPathClearI, isPathClearJ, moveRook
+	ChessPieceQueen: 
+		- queenLegalMove, moveQueen
+
+10/22 Josh 9:50PM:
+	chessBoard:
+		- added draw
+	
+10/23 Josh 11:26AM:
+	ChessPiecePawn:
+		- fixed pawn attack moves
+	ChessPieceRook:
+		- fixed skipping; rook cannot skip pieces anymore
+		
+10/23 Josh 11:34PM:
+	ChessHelper:
+		- movePiece(): for each piece, call its method "canCheck()" to determine if they're in *check* after their move.
+	ChessPiece: 
+		minimal changes.
+	chessBoard: 
+		minimal changes.
+	ChessPieceBishop:
+		- added canCheck() and removed moveBishop().
+	ChessPiecePawn:
+		- added canCheck() and removed movePawn().
+		- fixed pawn attack moves again.
+	ChessPieceQueen:
+		- added canCheck() and removed moveQueen().
+	ChessPieceRook:
+		- added canCheck().
+	ChessPieceKnight:
+		- added canCheck() and removed moveKnight().
+
+10/24 Josh 12:34AM:
+	ChessHelper:
+		- inCheck(): method that checks if any piece on the board can capture the enemy king.
+		used in movePiece() to determine if a move can put that team's king in *check* - if so, move is illegal.
+	ChessPieceKnight:
+		- fixed inCheck(), will not check for king in board indicies out of bounds.
+
+10/25 Josh 4:13PM:
+	- Added king moveset;
+		* can only move 1 space fwd/bwd/side/diag
+		* cannot move to space where it can be captured (check)
+		* cannot move to a space occupied by teammate
+		* castling (can move 2 spaces iff):
+			> king and rook involved has never moved
+			> king isn't skipping *checkable* space
+			> king isn't currently in check
+			> king isn't skipping pieces
+			> king does not end up in check
+		* castling moves the rook "behind" king
+
+10/25 Josh 8:26PM:
+	ChessHelper:
+		- Added checkmate; canUncheck(): method used to determine if a team can escape check. 
+		Traverse's board looking for same color pieces, then checks all possible spaces those pieces can go to. 
+		If a potential move prevents a checkmate, return's true.
+
+10/26 Parth 12:30PM:
+	ChessPiecePawn:
+		- added En Passant 
+	chessHelper:
+		- Fixed a bug where board was printing after illegal move
+
+10/26 Josh 5:04PM:
+	chessBoard & ChessHelper:
+		- added promotion
+		- check for inCheck in chessBoard rather than under each piece in ChessHelper

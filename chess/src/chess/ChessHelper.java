@@ -6,10 +6,11 @@ import chessPiece.*;
 public class ChessHelper {
 
 
+	public static int enPassantCounter = 0;
+
 	static int[] swap = {8,7,6,5,4,3,2,1,0};
 
-	// NEED TO CONVERT THE ORDER
-	// Gets all the current and target indexes
+
 	public static int getCurrentI(String input) {
 		return swap[Character.getNumericValue(input.charAt(1))];
 	}
@@ -28,22 +29,310 @@ public class ChessHelper {
 
 
 
-
-	// Tells us whether the piece is knight, queen etc
 	public static boolean movePiece(int i, int j, int ti, int tj) {
+		
+		ChessPiece tempC = chessBoard.board[i][j];
+		ChessPiece tempT = null;
 
-		if(ChessPieceKnight.class.isInstance(chessBoard.board[i][j])) {
-			if(ChessPieceKnight.knightLegalMove(i, j, ti, tj)) {
-				ChessPieceKnight.moveKnight(i, j, ti, tj);
+		boolean color = chessBoard.board[i][j].isBlack;
+
+		if(chessBoard.board[ti][tj] != null) {
+			tempT = chessBoard.board[ti][tj];
+		}
+
+		// Pawn
+		if(ChessPiecePawn.class.isInstance(chessBoard.board[i][j])) {	
+			if(ChessPiecePawn.pawnLegalMove(i, j, ti, tj)) {
+
+				//
+				ChessPiecePawn.canEnPassantMove(i, j, ti, tj);
+				//
+				
+				// promotion
+				if(ti==7 || ti==0) {
+					if(!chessBoard.wantPromo) {
+						return false;
+					}
+					chessBoard.canPromo=true;
+				}
+
+				ChessPiece.movePiece(i, j , ti, tj);
+				if(inCheck(color)) { // if true, revert pieces back to old state using temps
+					chessBoard.board[i][j] = tempC;
+					chessBoard.board[ti][tj] = tempT;
+					chessBoard.canEnPassantHere[0] = -1;
+					return false;
+				}
+				
 				return true;
-			} else {
-				return false;
 			}
 		}
+
+		// Knight
+		if(ChessPieceKnight.class.isInstance(chessBoard.board[i][j])) {
+			if(ChessPieceKnight.knightLegalMove(i, j, ti, tj)) {
+				ChessPiece.movePiece(i, j , ti, tj);
+				if(inCheck(color)) {
+					chessBoard.board[i][j] = tempC;
+					chessBoard.board[ti][tj] = tempT;
+					return false;
+				}
+
+				return true;
+			}
+		}
+
+		// Rook
+		if(ChessPieceRook.class.isInstance(chessBoard.board[i][j])) {
+			if(ChessPieceRook.rookLegalMove(i, j, ti, tj)) {
+				ChessPiece.movePiece(i, j , ti, tj);
+				if(inCheck(color)) {
+					chessBoard.board[i][j] = tempC;
+					chessBoard.board[ti][tj] = tempT;
+					return false;
+				}
+
+				return true;
+			}
+		}
+
+		// Queen
+		if(ChessPieceQueen.class.isInstance(chessBoard.board[i][j])) {
+			if(ChessPieceQueen.queenLegalMove(i, j, ti, tj)) {
+				ChessPiece.movePiece(i, j , ti, tj);
+				if(inCheck(color)) {
+					chessBoard.board[i][j] = tempC;
+					chessBoard.board[ti][tj] = tempT;
+					return false;
+				}
+	
+				return true;
+
+			}
+		}
+
+		// Bishop
+		if(ChessPieceBishop.class.isInstance(chessBoard.board[i][j])) {
+			if(ChessPieceBishop.bishopLegalMove(i, j, ti, tj)) {
+				ChessPiece.movePiece(i, j , ti, tj);
+				if(inCheck(color)) {
+					chessBoard.board[i][j] = tempC;
+					chessBoard.board[ti][tj] = tempT;
+					return false;
+				}
+
+				return true;
+			}
+		}
+
+		// King
+		if(ChessPieceKing.class.isInstance(chessBoard.board[i][j])) {	
+			if(ChessPieceKing.kingLegalMove(i, j, ti, tj)) {
+				ChessPiece.movePiece(i, j , ti, tj);
+				if(inCheck(color)) { // if true, revert pieces back to old state using temps
+					chessBoard.board[i][j] = tempC;
+					chessBoard.board[ti][tj] = tempT;
+					return false;
+				}
+				return true;
+			}
+		}
+
 		return false;
 	}
 
+	// given a team, traverse's through board and checks if any piece can capture that team's king. if so, team is in check.
+	public static boolean inCheck(boolean color) {
+		for(int i=0;i<8;i++) {
+			for(int j=0;j<8;j++) {
+				if(chessBoard.board[i][j] != null && chessBoard.board[i][j].isBlack != color){
+					if(ChessPiecePawn.class.isInstance(chessBoard.board[i][j])) {
+						if(ChessPiecePawn.pawnCanCheck(i, j)) {
+							return true;
+						}
+					}
+					if(ChessPieceKnight.class.isInstance(chessBoard.board[i][j])) {
+						if(ChessPieceKnight.knightCanCheck(i, j)) {
+							return true;
+						}
+					}
+					if(ChessPieceRook.class.isInstance(chessBoard.board[i][j])) {
+						if(ChessPieceRook.rookCanCheck(i, j)) {
+							return true;
+						}
+					}
+					if(ChessPieceBishop.class.isInstance(chessBoard.board[i][j])) {
+						if(ChessPieceBishop.bishopCanCheck(i, j)) {
+							return true;
+						}
+					}
+					if(ChessPieceQueen.class.isInstance(chessBoard.board[i][j])) {
+						if(ChessPieceQueen.queenCanCheck(i, j)) {
+							return true;
+						}
+					}
+					/*if(ChessPieceKing.class.isInstance(chessBoard.board[i][j])) {
+						if(ChessPieceKing.kingCanCheck(i, j)) {
+							return true;
+						}
+					}*/
+				}
+			}
+		}
 
+		return false;
+	}
+
+	// given a team, traverse's through board and checks if any same color piece can legally move to a space so that team is no longer in check.
+	public static boolean canUncheck(boolean color) {
+		ChessPiece tempC = null;
+		ChessPiece tempT = null;
+		
+		for(int i=0;i<8;i++) {
+			for(int j=0;j<8;j++) {
+				if(chessBoard.board[i][j] != null && chessBoard.board[i][j].isBlack == color) {
+					tempC = chessBoard.board[i][j];
+					tempT = null;
+					
+					if(ChessPiecePawn.class.isInstance(chessBoard.board[i][j])) {
+						for(int p=0;p<8;p++) {
+							for(int q=0;q<8;q++) {
+								if(ChessPiecePawn.pawnLegalMove(i, j, p, q)) {
+									if(chessBoard.board[p][q]!=null) {
+										tempT = chessBoard.board[p][q];
+									}
+									ChessPiecePawn.movePiece(i, j, p, q);
+									if(!inCheck(color)){
+										chessBoard.board[i][j]=tempC;
+										chessBoard.board[p][q]=tempT;
+										return true;
+									}else{
+										chessBoard.board[i][j]=tempC;
+										chessBoard.board[p][q]=tempT;
+										tempT=null;
+									}
+								}
+							}
+						}
+						continue;
+					}
+					if(ChessPieceQueen.class.isInstance(chessBoard.board[i][j])) {
+						for(int p=0;p<8;p++) {
+							for(int q=0;q<8;q++) {
+								if(ChessPieceQueen.queenLegalMove(i, j, p, q)) {
+									if(chessBoard.board[p][q]!=null) {
+										tempT = chessBoard.board[p][q];
+									}
+									ChessPieceQueen.movePiece(i, j, p, q);
+									if(!inCheck(color)){
+										chessBoard.board[i][j]=tempC;
+										chessBoard.board[p][q]=tempT;
+										return true;
+									}else{
+										chessBoard.board[i][j]=tempC;
+										chessBoard.board[p][q]=tempT;
+										tempT=null;
+									}
+								}
+							}
+						}
+						continue;
+					}
+					if(ChessPieceBishop.class.isInstance(chessBoard.board[i][j])) {
+						for(int p=0;p<8;p++) {
+							for(int q=0;q<8;q++) {
+								if(ChessPieceBishop.bishopLegalMove(i, j, p, q)) {
+									if(chessBoard.board[p][q]!=null) {
+										tempT = chessBoard.board[p][q];
+									}
+									ChessPieceBishop.movePiece(i, j, p, q);
+									if(!inCheck(color)){
+										chessBoard.board[i][j]=tempC;
+										chessBoard.board[p][q]=tempT;
+										return true;
+									}else{
+										chessBoard.board[i][j]=tempC;
+										chessBoard.board[p][q]=tempT;
+										tempT=null;
+									}
+								}
+							}
+						}
+						continue;
+					}
+					if(ChessPieceRook.class.isInstance(chessBoard.board[i][j])) {
+						for(int p=0;p<8;p++) {
+							for(int q=0;q<8;q++) {
+								if(ChessPieceRook.rookLegalMove(i, j, p, q)) {
+									if(chessBoard.board[p][q]!=null) {
+										tempT = chessBoard.board[p][q];
+									}
+									ChessPieceRook.movePiece(i, j, p, q);
+									if(!inCheck(color)){
+										chessBoard.board[i][j]=tempC;
+										chessBoard.board[p][q]=tempT;
+										return true;
+									}else{
+										chessBoard.board[i][j]=tempC;
+										chessBoard.board[p][q]=tempT;
+										tempT=null;
+									}
+								}
+							}
+						}
+						continue;
+					}
+					if(ChessPieceKnight.class.isInstance(chessBoard.board[i][j])) {
+						for(int p=0;p<8;p++) {
+							for(int q=0;q<8;q++) {
+								if(ChessPieceKnight.knightLegalMove(i, j, p, q)) {
+									if(chessBoard.board[p][q]!=null) {
+										tempT = chessBoard.board[p][q];
+									}
+									ChessPieceKnight.movePiece(i, j, p, q);
+									if(!inCheck(color)){
+										chessBoard.board[i][j]=tempC;
+										chessBoard.board[p][q]=tempT;
+										return true;
+									}else{
+										chessBoard.board[i][j]=tempC;
+										chessBoard.board[p][q]=tempT;
+										tempT=null;
+									}
+								}
+							}
+						}
+						continue;
+					}
+					if(ChessPieceKing.class.isInstance(chessBoard.board[i][j])) {
+						for(int p=0;p<8;p++) {
+							for(int q=0;q<8;q++) {
+								if(Math.abs(q-j)<2) {
+									if(ChessPieceKing.kingLegalMove(i, j, p, q)) {
+										if(chessBoard.board[p][q]!=null) {
+											tempT = chessBoard.board[p][q];
+										}
+										ChessPieceKing.movePiece(i, j, p, q);
+										if(!inCheck(color)){
+											chessBoard.board[i][j]=tempC;
+											chessBoard.board[p][q]=tempT;
+											return true;
+										}else{
+											chessBoard.board[i][j]=tempC;
+											chessBoard.board[p][q]=tempT;
+											tempT=null;
+										}
+									}
+								}
+							}
+						}
+						continue;
+					}
+				}
+			}
+		}				
+		return false;
+	}
 
 	public static boolean isWithInBoard(int i, int j) {
 		if(i > 8 || j > 8) {
@@ -52,23 +341,37 @@ public class ChessHelper {
 		return true;
 	}
 
-	
+
 	// checks is the turns are correct (white moves first)
 	public static boolean checkTurn(int counter, int currentI, int currentJ) {
+
+		if(isCellEmpty(currentI,currentJ)) {
+			System.out.println("Illegal move, try again\n");
+			//chessBoard.printBoard();
+			return false;
+		}
+
 		if(counter%2 == 0) {
 			if(chessBoard.board[currentI][currentJ].checkColor()) {
 				System.out.println("Illegal move, try again\n");
-				chessBoard.printBoard();
+				//chessBoard.printBoard();
 				return false;
 			}
 		} else {
-			if(chessBoard.board[currentI][currentJ].checkColor()) {
+			if(!chessBoard.board[currentI][currentJ].checkColor()) {
 				System.out.println("Illegal move, try again\n");
-				chessBoard.printBoard();
+				//chessBoard.printBoard();
 				return false;
 			}
 		}
 		return true;
+	}
+
+	public static boolean isCellEmpty(int currentI, int currentJ) {
+		if(chessBoard.board[currentI][currentJ] == null) {
+			return true;
+		}
+		return false;
 	}
 
 
