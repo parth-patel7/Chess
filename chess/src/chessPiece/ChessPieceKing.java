@@ -5,13 +5,36 @@ import java.lang.Math;
 import chess.chessBoard;
 import chess.ChessHelper;
 
+/**
+ * @author parthpatel
+ * @author joshherrera
+ */
 public class ChessPieceKing extends ChessPiece{
 
 
+	
+	/**
+	 * Constructor to initialize king object (boolean value true if the color is black
+	 * and false for white)
+	 * @param color Color of the piece (true for black false for white)
+	 */
 	public ChessPieceKing(boolean color) {
 		this.isBlack = color;
 	}
 	
+	
+	
+
+	
+	/**
+	 * This method takes current and target location for the queen and returns true if the target 
+	 * location is legal.
+	 * @param i Current rank of the king
+	 * @param j Current file of the king
+	 * @param targetI Target rank for the king
+	 * @param targetJ Target file for the king
+	 * @return boolean value
+	 */
 	public static boolean kingLegalMove(int i, int j, int targetI, int targetJ) {
 		ChessPiece tempC = chessBoard.board[i][j];
 		ChessPiece tempT = null;
@@ -117,15 +140,25 @@ public class ChessPieceKing extends ChessPiece{
 		return legalMove;
 	}
 
+	
+	
+	/**
+	 * This method takes current location of the king and returns true if it can send a check to opponent's king.
+	 * @param i Current rank of the king
+	 * @param j Current file of the king
+	 * @return boolean value
+	 */
 	public static boolean kingCanCheck(int i, int j) {
 		boolean color = chessBoard.board[i][j].isBlack;
 		
 		for(int p=0;p<8;p++) {
 			for(int q=0;q<8;q++) {
-				if(ChessPieceKing.kingLegalMove(i, j, p, q)) {
-					if(chessBoard.board[p][q]!=null) {
-						if(ChessPieceKing.class.isInstance(chessBoard.board[p][q]) && chessBoard.board[p][q].isBlack != color) {
-							return true;
+				if(Math.abs(p-i) <= 1 && Math.abs(q-j) <= 1) {
+					if(ChessPieceKing.kingLegalMove(i, j, p, q)) {
+						if(chessBoard.board[p][q]!=null) {
+							if(ChessPieceKing.class.isInstance(chessBoard.board[p][q]) && chessBoard.board[p][q].isBlack != color) {
+								return true;
+							}
 						}
 					}
 				}
@@ -135,6 +168,11 @@ public class ChessPieceKing extends ChessPiece{
 		return false;
 	}
 
+	
+	
+	/**
+	 * This method prints the king object.
+	 */
 	public String toString() {
 		if(this.checkColor()) {
 			return "bK ";

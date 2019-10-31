@@ -2,9 +2,18 @@ package chessPiece;
 
 import chess.*;
 
+/**
+ * @author parthpatel
+ * @author joshherrera
+ */
 public class ChessPieceKnight extends ChessPiece{
 
 
+	/**
+	 * Constructor to initialize knight object (boolean value true if the color is black
+	 * and false for white)
+	 * @param color Color of the piece (true for black false for white)
+	 */
 	public ChessPieceKnight(boolean color) {
 		this.isBlack = color;
 	}
@@ -22,6 +31,15 @@ public class ChessPieceKnight extends ChessPiece{
 	 * (i+1, j-2)
 	 * (i+2, j-1)
 	 * 
+	 */
+	/**
+	 * This method takes current and target location for the knight and returns true if the target 
+	 * location is legal.
+	 * @param i Current rank of the knight
+	 * @param j Current file of the knight
+	 * @param targetI Target rank for the knight
+	 * @param targetJ Target file for the knight
+	 * @return boolean value
 	 */
 	public static boolean knightLegalMove(int i, int j, int targetI, int targetJ) {
 
@@ -66,6 +84,13 @@ public class ChessPieceKnight extends ChessPiece{
 		return legalMove;
 	}
 
+	
+	/**
+	 * This method takes current location of the knight and returns true if it can send a check to opponent's king.
+	 * @param i Current rank of the knight
+	 * @param j Current file of the knight
+	 * @return boolean value
+	 */
 	public static boolean knightCanCheck(int i, int j) {
 		boolean c = chessBoard.board[i][j].isBlack;
 		
@@ -129,6 +154,10 @@ public class ChessPieceKnight extends ChessPiece{
 		return false;
 	}
 
+	
+	/**
+	 * This method prints the knight object.
+	 */
 	public String toString() {
 		if(this.checkColor()) {
 			return "bN ";

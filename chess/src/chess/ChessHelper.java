@@ -3,34 +3,70 @@ package chess;
 
 import chessPiece.*;
 
+/**
+ * @author parthpatel
+ * @author joshherrera
+ *
+ */
 public class ChessHelper {
 
 
 	public static int enPassantCounter = 0;
-
+	public static int enPassantDone = 0;
 	static int[] swap = {8,7,6,5,4,3,2,1,0};
 
-
+	/**
+	 * This method takes the user input (String) and returns the current rank in which the piece is.
+	 * @param input user input
+	 * @return current rank index of the piece
+	 */
 	public static int getCurrentI(String input) {
 		return swap[Character.getNumericValue(input.charAt(1))];
 	}
 
+	
+	/**
+	 * This method takes the user input (String) and returns the current file in which the piece is.
+	 * @param input user input
+	 * @return current file index of the piece
+	 */
 	public static int getCurrentJ(String input) {
 		return (int)input.charAt(0)-(int)'a';
 	}
 
+	
+	/**
+	 * This method takes the user input (String) and returns the target rank for the piece.
+	 * @param input user input
+	 * @return target rank index for the piece
+	 */
 	public static int getTargetI(String input) {
 		return swap[Character.getNumericValue(input.charAt(4))];
 	}
+	
 
+	/**
+	 * This method takes the user input (String) and returns the target file for the piece.
+	 * @param input user input
+	 * @return target file index for the piece
+	 */
 	public static int getTargetJ(String input) {
 		return (int)input.charAt(3)-(int)'a';
 	}
 
-
-
+	
+	
+	/**
+	 * This method takes current and target location for piece and returns true if the piece
+	 * was able to move false otherwise
+	 * @param i current rank index of the piece
+	 * @param j current file index of the piece
+	 * @param ti target rank index for the piece
+	 * @param tj target file index for the piece
+	 * @return boolean value 
+	 */
 	public static boolean movePiece(int i, int j, int ti, int tj) {
-		
+
 		ChessPiece tempC = chessBoard.board[i][j];
 		ChessPiece tempT = null;
 
@@ -47,7 +83,7 @@ public class ChessHelper {
 				//
 				ChessPiecePawn.canEnPassantMove(i, j, ti, tj);
 				//
-				
+
 				// promotion
 				if(ti==7 || ti==0) {
 					if(!chessBoard.wantPromo) {
@@ -57,13 +93,20 @@ public class ChessHelper {
 				}
 
 				ChessPiece.movePiece(i, j , ti, tj);
+
+				if(enPassantDone == 1) {
+					chessBoard.board[i][tj] = null;
+					enPassantDone = 0;
+
+				}
+
 				if(inCheck(color)) { // if true, revert pieces back to old state using temps
 					chessBoard.board[i][j] = tempC;
 					chessBoard.board[ti][tj] = tempT;
 					chessBoard.canEnPassantHere[0] = -1;
 					return false;
 				}
-				
+
 				return true;
 			}
 		}
@@ -105,7 +148,7 @@ public class ChessHelper {
 					chessBoard.board[ti][tj] = tempT;
 					return false;
 				}
-	
+
 				return true;
 
 			}
@@ -141,7 +184,14 @@ public class ChessHelper {
 		return false;
 	}
 
-	// given a team, traverse's through board and checks if any piece can capture that team's king. if so, team is in check.
+	
+	
+	/**
+	 * This method given a team (color), traverse's through board and checks if any piece can capture that team's king. 
+	 * if so, team is in check. Returns true if it can and false otherwise
+	 * @param color Color to decide the team
+	 * @return boolean value
+	 */
 	public static boolean inCheck(boolean color) {
 		for(int i=0;i<8;i++) {
 			for(int j=0;j<8;j++) {
@@ -171,11 +221,11 @@ public class ChessHelper {
 							return true;
 						}
 					}
-					/*if(ChessPieceKing.class.isInstance(chessBoard.board[i][j])) {
+					if(ChessPieceKing.class.isInstance(chessBoard.board[i][j])) {
 						if(ChessPieceKing.kingCanCheck(i, j)) {
 							return true;
 						}
-					}*/
+					}
 				}
 			}
 		}
@@ -183,17 +233,26 @@ public class ChessHelper {
 		return false;
 	}
 
-	// given a team, traverse's through board and checks if any same color piece can legally move to a space so that team is no longer in check.
+	
+	
+	
+	
+	/**
+	 * This method given a team (color), traverse's through board and checks if any same color piece can legally 
+	 * move to a space so that team is no longer in check. Return true if it can otherwise false
+	 * @param color Color to decide the team
+	 * @return boolean value
+	 */
 	public static boolean canUncheck(boolean color) {
 		ChessPiece tempC = null;
 		ChessPiece tempT = null;
-		
+
 		for(int i=0;i<8;i++) {
 			for(int j=0;j<8;j++) {
 				if(chessBoard.board[i][j] != null && chessBoard.board[i][j].isBlack == color) {
 					tempC = chessBoard.board[i][j];
 					tempT = null;
-					
+
 					if(ChessPiecePawn.class.isInstance(chessBoard.board[i][j])) {
 						for(int p=0;p<8;p++) {
 							for(int q=0;q<8;q++) {
@@ -334,6 +393,13 @@ public class ChessHelper {
 		return false;
 	}
 
+	/**
+	 * This method checks if the rank or file is greater than 8
+	 * Returns true if it's under 8 and false other wise
+	 * @param i rank value
+	 * @param j file value
+	 * @return boolean value
+	 */
 	public static boolean isWithInBoard(int i, int j) {
 		if(i > 8 || j > 8) {
 			return false;
@@ -341,38 +407,50 @@ public class ChessHelper {
 		return true;
 	}
 
-
-	// checks is the turns are correct (white moves first)
+	
+	/**
+	 * This method checks for the correct turn or 
+	 * if the user tried to move a piece from an empty location and returns true if everything
+	 * is in correct order
+	 * @param counter -to check whose turn it is (even for white side, odd for black side) 
+	 * @param currentI -row in which the piece is
+	 * @param currentJ -column in which the piece is
+	 * @return boolean value  
+	 */
 	public static boolean checkTurn(int counter, int currentI, int currentJ) {
 
 		if(isCellEmpty(currentI,currentJ)) {
 			System.out.println("Illegal move, try again\n");
-			//chessBoard.printBoard();
 			return false;
 		}
 
 		if(counter%2 == 0) {
 			if(chessBoard.board[currentI][currentJ].checkColor()) {
 				System.out.println("Illegal move, try again\n");
-				//chessBoard.printBoard();
 				return false;
 			}
 		} else {
 			if(!chessBoard.board[currentI][currentJ].checkColor()) {
 				System.out.println("Illegal move, try again\n");
-				//chessBoard.printBoard();
 				return false;
 			}
 		}
 		return true;
 	}
 
+	
+	/**
+	 * This method takes current location of the piece and checks if the piece is present or not
+	 * return true if the piece is present
+	 * @param currentI Current rank of the piece
+	 * @param currentJ Current file of the piece
+	 * @return boolean value
+	 */
 	public static boolean isCellEmpty(int currentI, int currentJ) {
 		if(chessBoard.board[currentI][currentJ] == null) {
 			return true;
 		}
 		return false;
 	}
-
 
 }

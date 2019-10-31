@@ -1,8 +1,19 @@
 package chessPiece;
 import chess.*;
 
+/**
+ * @author parthpatel
+ * @author joshherrera
+ */
 public class ChessPieceRook extends ChessPiece{
 
+	
+	
+	/**
+	 * Constructor to initialize rook object (boolean value true if the color is black
+	 * and false for white)
+	 * @param color Color of the piece (true for black false for white)
+	 */
 	public ChessPieceRook(boolean color) {
 		this.isBlack = color;
 	}
@@ -14,6 +25,16 @@ public class ChessPieceRook extends ChessPiece{
 	 * can't skip pieces.
 	 */
 
+	
+	/**
+	 * This method takes current and target location for the rook and returns true if the target 
+	 * location is legal.
+	 * @param currentI Current rank of the rook
+	 * @param currentJ Current file of the rook
+	 * @param targetI Target rank for the rook
+	 * @param targetJ Target file for the rook
+	 * @return boolean value
+	 */
 	public static boolean rookLegalMove(int currentI, int currentJ, int targetI, int targetJ) {
 
 		if(!ChessHelper.isWithInBoard(targetI, targetJ)) {
@@ -46,7 +67,16 @@ public class ChessPieceRook extends ChessPiece{
 	}
 
 
-	// Checks if I-direction path clear or not
+
+	/**
+	 * This method takes in current and target location for the rook and checks if there is any piece blocking the
+	 * path (In I direction) returns true if nothing is blocking and false otherwise
+	 * @param i Current rank of the rook
+	 * @param j Current file of the rook
+	 * @param targetI Target rank for the rook
+	 * @param targetJ Target file for the rook
+	 * @return boolean value
+	 */
 	public static boolean isPathClearI(int i, int j, int targetI, int targetJ) {
 		if(i > targetI) {
 			for(int k=i-1; k>targetI; k--) {
@@ -65,7 +95,17 @@ public class ChessPieceRook extends ChessPiece{
 		return true;
 	}
 
-	// Checks if J-direction path clear or not
+
+	
+	/**
+	 * This method takes in current and target location for the rook and checks if there is any piece blocking the
+	 * path (In J direction) returns true if nothing is blocking and false otherwise
+	 * @param i Current rank of the rook
+	 * @param j Current file of the rook
+	 * @param targetI Target rank for the rook
+	 * @param targetJ Target file for the rook
+	 * @return boolean value
+	 */
 	public static boolean isPathClearJ(int i, int j, int targetI, int targetJ) {
 		if(j > targetJ) {
 			for(int k=j-1; k>targetJ; k--) {
@@ -83,6 +123,14 @@ public class ChessPieceRook extends ChessPiece{
 		return true;
 	}
 	
+	
+	
+	/**
+	 * This method takes current location of the rook and returns true if it can send a check to opponent's king.
+	 * @param i Current rank of the rook
+	 * @param j Current file of the rook
+	 * @return boolean value
+	 */
 	public static boolean rookCanCheck(int i, int j) {
 		int up,down,left,right;
 		up = i;
@@ -140,6 +188,11 @@ public class ChessPieceRook extends ChessPiece{
 		return false;
 	}
 
+	
+	
+	/**
+	 * This method prints the rook object.
+	 */
 	public String toString() {
 		if(this.checkColor()) {
 			return "bR ";

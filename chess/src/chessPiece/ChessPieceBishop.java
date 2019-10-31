@@ -4,8 +4,18 @@ import chess.*;
 
 import java.lang.Math;
 
+/**
+ * @author parthpatel
+ * @author joshherrera
+ */
 public class ChessPieceBishop extends ChessPiece{
 
+	
+	/**
+	 * Constructor to initialize bishop object (boolean value true if the color is black
+	 * and false for white)
+	 * @param color Color of the piece (true for black false for white)
+	 */
 	public ChessPieceBishop(boolean color) {
 		this.isBlack = color;
 	}
@@ -18,6 +28,15 @@ public class ChessPieceBishop extends ChessPiece{
 	 * can't skip pieces.
 	*/
 	
+	/**
+	 * This method takes current and target location for the bishop and returns true if the target 
+	 * location is legal.
+	 * @param i Current rank of the bishop
+	 * @param j Current file of the bishop
+	 * @param targetI Target rank for the bishop
+	 * @param targetJ Target file for the bishop
+	 * @return boolean value
+	 */
 	public static boolean bishopLegalMove(int i, int j, int targetI, int targetJ) {
 		boolean legalMove = false;
 		int n = targetI - i;
@@ -94,6 +113,14 @@ public class ChessPieceBishop extends ChessPiece{
 		return legalMove;
 	}
 
+	
+	
+	/**
+	 * This method takes current location of the bishop and returns true if it can send a check to opponent's king.
+	 * @param i Current rank of the bishop
+	 * @param j Current file of the bishop
+	 * @return boolean value
+	 */
 	public static boolean bishopCanCheck(int i, int j) {
 		int up,down,left,right;
 		up = i;
@@ -159,6 +186,9 @@ public class ChessPieceBishop extends ChessPiece{
 	
 	}
 	
+	/**
+	 * This method prints the bishop object.
+	 */
 	public String toString() {
 		if(this.checkColor()) {
 			return "bB ";

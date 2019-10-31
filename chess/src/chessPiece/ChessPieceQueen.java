@@ -1,8 +1,18 @@
 package chessPiece;
 import chess.*;
 
+/**
+ * @author parthpatel
+ * @author joshherrera
+ */
+
 public class ChessPieceQueen extends ChessPiece{
 
+	/**
+	 * Constructor to initialize queen object (boolean value true if the color is black
+	 * and false for white)
+	 * @param color Color of the piece (true for black false for white)
+	 */
 	public ChessPieceQueen(boolean color) {
 		this.isBlack = color;
 	}
@@ -14,9 +24,16 @@ public class ChessPieceQueen extends ChessPiece{
 	 * can't skip pieces.
 	 */
 
-	// if current i is same as target i 
-	// or if current j is same as target j then the queen is trying to move as rook
-	// else as bishop
+
+	/**
+	 * This method takes current and target location for the queen and returns true if the target 
+	 * location is legal.
+	 * @param currentI Current rank of the queen
+	 * @param currentJ Current file of the queen
+	 * @param targetI Target rank for the queen
+	 * @param targetJ Target file for the queen
+	 * @return boolean value
+	 */
 	public static boolean queenLegalMove(int currentI, int currentJ, int targetI, int targetJ) {
 
 		if(!ChessHelper.isWithInBoard(targetI, targetJ)) {
@@ -31,6 +48,12 @@ public class ChessPieceQueen extends ChessPiece{
 
 	}
 	
+	/**
+	 * This method takes current location of the queen and returns true if it can send a check to opponent's king
+	 * @param i Current rank of the queen
+	 * @param j Current file of the queen
+	 * @return boolean value
+	 */
 	public static boolean queenCanCheck(int i, int j) {
 		if(ChessPieceBishop.bishopCanCheck(i, j)) {
 			return true;
@@ -41,6 +64,9 @@ public class ChessPieceQueen extends ChessPiece{
 		}
 	}
 
+	/**
+	 * This method prints the queen object.
+	 */
 	public String toString() {
 		if(this.checkColor()) {
 			return "bQ ";

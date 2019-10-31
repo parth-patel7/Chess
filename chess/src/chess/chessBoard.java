@@ -4,6 +4,10 @@ import java.util.*;
 
 import chessPiece.*;
 
+/**
+ * @author parthpatel
+ * @author joshherrera
+ */
 public class chessBoard {
 
 	public static boolean whiteCastleKing = true;
@@ -20,6 +24,9 @@ public class chessBoard {
 	public static int [] canEnPassantHere = new int[2];
 
 
+	/**
+	 * This method loads all the pieces in the chess board array
+	 */
 	public static void loadGame() {
 
 		// Filling all black pieces
@@ -55,6 +62,9 @@ public class chessBoard {
 	}
 
 
+	/**
+	 * This method prints the chess board
+	 */
 	public static void printBoard() {
 
 		for(int i =0; i<9; i++) {
@@ -92,27 +102,35 @@ public class chessBoard {
 	}
 
 
-
+	/**
+	 * This method runs the game 
+	 * checks if the move and turns are legal 
+	 * if there is a check, checkmate or stalemate
+	 */
 	public static void runGame() {
-
 
 		int counter = 0;
 		int currentI, currentJ, targetI, targetJ;
 		String input = null;
 		boolean drawMode = false;
+		int drawCounter = 0;
 
 		while(true) {
 
 			Scanner scanner = new Scanner(System.in);
 
 			//*
-			ChessHelper.enPassantCounter++;
+			if(chessBoard.canEnPassantHere[0] != -1) {
+				ChessHelper.enPassantCounter++;
+			}
 			if(ChessHelper.enPassantCounter == 3) {
 				ChessHelper.enPassantCounter = 0;
 				chessBoard.canEnPassantHere[0] = -1;
 			}
 			//*
 
+			
+			
 			if(counter%2 == 0) {
 				// check if the piece is black 
 				System.out.print("White's move:");
@@ -134,13 +152,20 @@ public class chessBoard {
 				System.out.println();
 			}
 
-			// draw implementation
-			if(input.contains("draw")) {
-				if(!drawMode) {
-					drawMode = true;
-				} else {
+			if(input.endsWith("draw?")) {
+				drawCounter = 1;
+			}
+
+			if(input.endsWith("draw")) {
+				if(drawCounter == 1) {
 					System.out.println("draw");
 					break;
+				}
+			}
+
+			if(!input.endsWith("draw") && !input.endsWith("draw?")) {
+				if(drawCounter == 1) {
+					drawCounter = 0;
 				}
 			}
 
@@ -148,15 +173,18 @@ public class chessBoard {
 			currentJ = ChessHelper.getCurrentJ(input);
 			targetI = ChessHelper.getTargetI(input);
 			targetJ = ChessHelper.getTargetJ(input);
-
-			if(input.length()==7) {
+			
+			
+			if(input.contains("Q") || input.contains("N") || input.contains("R") || input.contains("B")) {
 				wantPromo=true;
 			}
 
 			// Checks White and Black turns
-			if(!ChessHelper.checkTurn(counter,currentI,currentJ )) {
+			if(!ChessHelper.checkTurn(counter,currentI,currentJ)) {
+				ChessHelper.enPassantCounter--;
 				continue;
 			}	
+		
 
 			// If turn is correct, move on
 			if(!ChessHelper.movePiece(currentI, currentJ, targetI, targetJ)) {
@@ -165,6 +193,7 @@ public class chessBoard {
 				continue;
 			}
 
+			// (pawn promotion)
 			if(canPromo) {
 				promo = input.charAt(6);
 				promoColor = board[targetI][targetJ].isBlack;
@@ -181,27 +210,39 @@ public class chessBoard {
 				if(promo.equals('B')) {
 					board[targetI][targetJ] = new ChessPieceBishop(promoColor);
 				}
-
 				wantPromo=false;
 				canPromo=false;
-
 			}
 
+			chessBoard.printBoard();
+
+			// (end game):
+			// if: in check && cannot uncheck -> checkmate
+			// if: not in check && cannot uncheck -> stalemate
+			// if: not in check && can uncheck -> continue
 			if(ChessHelper.inCheck(!chessBoard.board[targetI][targetJ].isBlack)) {
 				System.out.println("Check");
+				// Detect for checkmate
 				if(!ChessHelper.canUncheck(!chessBoard.board[targetI][targetJ].isBlack)) {
+					System.out.println("Checkmate");
 					if(chessBoard.board[targetI][targetJ].isBlack) {
-						System.out.println("Black Wins.");
+						System.out.println("Black Wins");
 					}else{
-						System.out.println("White Wins.");
+						System.out.println("White Wins");
+
 					}
-					chessBoard.printBoard();
+					break;
+				}
+			}else {
+				// Detect for stalemate
+				if(!ChessHelper.canUncheck(!chessBoard.board[targetI][targetJ].isBlack)) {
+					System.out.println("Stalemate");
+					System.out.println("draw");
 					break;
 				}
 			}
 
-
-
+			// (castling): 	determine if either king has moved, if so, that team cannot castle.
 			if(ChessPieceKing.class.isInstance(board[targetI][targetJ])) {
 				if(board[targetI][targetJ].isBlack) {
 					blackCastleKing = false;
@@ -213,20 +254,21 @@ public class chessBoard {
 
 			}
 
-			if(currentI==7 && currentJ==7) {
+			// (castling): 	determine if attempted rook has ever moved or had been captured, 
+			//				if so, that team cannot castle on that side.
+			if((currentI==7 && currentJ==7) || (targetI==7 && targetJ==7)) {
 				whiteCastleKing = false;
 			}
-			if(currentI==7 && currentJ==0) {
+			if((currentI==7 && currentJ==0) || (targetI==7 && targetJ==0)) {
 				whiteCastleQueen = false;
 			}
-			if(currentI==0 && currentJ==0) {
+			if(currentI==0 && currentJ==0 || (targetI==0 && targetJ==0)) {
 				blackCastleQueen = false;
 			}
-			if(currentI==0 && currentJ==7) {
+			if(currentI==0 && currentJ==7 || (targetI==0 && targetJ==7)) {
 				blackCastleKing = false;
 			}
 
-			chessBoard.printBoard();
 			counter++;
 		}
 	}
